@@ -23,7 +23,6 @@ for:
      - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy nose"
      - activate test-environment
      - pip install coverage
-     - pip install -r requirements.txt
      - python setup.py install
 -
   matrix:
