@@ -1,0 +1,48 @@
+build: false
+
+image:
+  - Ubuntu
+  - Visual Studio 2015
+
+
+environment:
+  matrix:
+    - PYTHON_VERSION: 3
+      MINICONDA: C:\Miniconda
+for:
+-
+  matrix:
+    only:
+        - image: Visual Studio 2015
+        
+  install:
+     - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+     - conda config --set always_yes yes --set changeps1 no
+     - conda update -q conda
+     - conda info -a
+     - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy nose"
+     - activate test-environment
+     - pip install coverage
+     - pip install -r requirements.txt
+     - python setup.py install
+-
+  matrix:
+    only:
+        - image: Ubuntu
+        
+  install:
+     - wget http://repo.continuum.io/miniconda/Miniconda-3.9.1-Linux-x86_64.sh -O miniconda.sh
+     - chmod +x miniconda.sh && ./miniconda.sh -b
+     - export PATH=/home/appveyor/miniconda/bin:$PATH
+     - conda update --yes conda
+     - deps="nomkl pip numpy scipy"
+     - conda create -p $HOME/py --yes $deps python=3
+     - export PATH=$HOME/py/bin:$PATH
+     - sudo apt-get install -qq libatlas-base-dev gfortran
+     - export ATLAS="/usr/lib/atlas-base/libatlas.so"
+     - pip install nose
+     - python setup.py install
+
+
+test_script:
+  - nosetests
